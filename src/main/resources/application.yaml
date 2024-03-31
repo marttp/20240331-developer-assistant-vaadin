@@ -16,7 +16,6 @@ spring:
       chat:
         options:
           model: mistral
-    vectorstore:
 
 chroma:
   url: ${CHROMA_URL:http://localhost:8000}

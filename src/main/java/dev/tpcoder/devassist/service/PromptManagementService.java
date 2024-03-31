@@ -1,6 +1,9 @@
 package dev.tpcoder.devassist.service;
 
+import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.SystemPromptTemplate;
+import org.springframework.ai.document.Document;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
@@ -30,13 +33,14 @@ public class PromptManagementService {
 
     private static final Logger logger = LoggerFactory.getLogger(PromptManagementService.class);
 
-    @Value("classpath:/system-qa.st")
-    private Resource systemPrompt;
-
+    private final Resource systemPrompt;
+    private final VectorStore vectorStore;
     private final Map<String, List<Message>> chatHistoryLog;
     private final Map<String, List<Message>> messageAggregations;
 
-    public PromptManagementService() {
+    public PromptManagementService(@Value("classpath:/system-qa.st") Resource systemPrompt, VectorStore vectorStore) {
+        this.systemPrompt = systemPrompt;
+        this.vectorStore = vectorStore;
         this.chatHistoryLog = new ConcurrentHashMap<>();
         this.messageAggregations = new ConcurrentHashMap<>();
     }
@@ -49,13 +53,19 @@ public class PromptManagementService {
         this.chatHistoryLog.computeIfAbsent(chatId, key -> new ArrayList<>()).add(message);
     }
 
-    public Message getSystemMessage(String chatId) {
+    public Message getSystemMessage(String chatId, String message) {
+        // Retrieve related documents to query
+        List<Document> similarDocuments = this.vectorStore.similaritySearch(message);
         List<Message> conversationHistory = this.chatHistoryLog.get(chatId);
+
         String history = conversationHistory.stream()
                 .map(m -> m.getMessageType().name().toLowerCase() + ": " + m.getContent())
                 .collect(Collectors.joining(System.lineSeparator()));
+        String documents = similarDocuments.stream().map(Document::getContent)
+                .collect(Collectors.joining(System.lineSeparator()));
 
         Map<String, Object> prepareHistory = Map.of(
+                "documents", documents,
                 "current_date", java.time.LocalDate.now(),
                 "history", history
         );

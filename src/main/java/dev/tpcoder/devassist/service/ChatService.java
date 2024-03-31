@@ -32,7 +32,7 @@ public class ChatService {
     }
 
     public Flux<ChatResponse> chat(String chatId, String message) {
-        Message systemMessage = promptManagementService.getSystemMessage(chatId);
+        Message systemMessage = promptManagementService.getSystemMessage(chatId, message);
         UserMessage userMessage = new UserMessage(message);
         promptManagementService.addMessage(chatId, userMessage);
         logger.debug("Chatting with chatId: {} and message: {}", chatId, message);
