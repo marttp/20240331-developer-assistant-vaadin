@@ -36,3 +36,6 @@ Today is {current_date}.
 
 HISTORY:
 {history}
+
+DOCUMENTS:
+{documents}
