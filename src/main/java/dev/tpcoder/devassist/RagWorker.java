@@ -25,18 +25,13 @@ public class RagWorker {
     }
 
     @PostConstruct
-    public void init(TokenTextSplitter tokenTextSplitter) {
-
+    public void init() {
         var extractedTextFormatter = new ExtractedTextFormatter.Builder().build();
         var config = PdfDocumentReaderConfig.builder()
                 .withPageExtractedTextFormatter(extractedTextFormatter)
                 .build();
         var pdfReader = new PagePdfDocumentReader(pdfResource, config);
+        TokenTextSplitter tokenTextSplitter = new TokenTextSplitter();
         vectorStore.accept(tokenTextSplitter.apply(pdfReader.get()));
-    }
-
-    @Bean
-    TokenTextSplitter tokenTextSplitter() {
-        return new TokenTextSplitter();
     }
 }
