@@ -1,0 +1,30 @@
+server:
+  port: ${PORT:8080}
+  shutdown: graceful
+
+spring:
+  application:
+    name: developer-assistance
+  mustache:
+    check-template-location: false
+  threads:
+    virtual:
+      enabled: true
+  ai:
+    ollama:
+      base-url: ${AI_OLLAMA_BASE_URL:http://localhost:11434}
+      chat:
+        options:
+          model: mistral
+    vectorstore:
+
+chroma:
+  url: ${CHROMA_URL:http://localhost:8000}
+
+logging:
+  level:
+    org.atmosphere: warn
+
+# Launch the default browser when starting the application in development mode
+vaadin:
+  launch-browser: true
