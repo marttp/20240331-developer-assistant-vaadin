@@ -17,9 +17,6 @@ spring:
         options:
           model: mistral
 
-chroma:
-  url: ${CHROMA_URL:http://localhost:8000}
-
 logging:
   level:
     org.atmosphere: warn
